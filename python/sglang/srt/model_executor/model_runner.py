@@ -747,7 +747,7 @@ class ModelRunner:
         load_format: Optional[str] = None,
     ):
         named_tensors = [
-            (name, _unwrap_tensor(tensor, tp_rank=self.tp_rank))
+            (name, _unwrap_tensor(tensor, tp_rank=self.tp_rank).to(device=torch.cuda.current_device()))
             for name, tensor in named_tensors
         ]
         if load_format == "direct":
