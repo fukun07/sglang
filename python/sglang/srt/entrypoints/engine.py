@@ -407,6 +407,21 @@ class Engine(EngineBase):
             self.tokenizer_manager.update_weights_from_tensor(obj, None)
         )
 
+    async def async_update_weights_from_tensor(
+        self,
+        named_tensors: List[Tuple[str, torch.Tensor]],
+        load_format: Optional[str] = None,
+        flush_cache: bool = True,
+    ):
+        """Update weights from distributed source. If there are going to be more updates, set `flush_cache` to be false
+        to avoid duplicated cache cleaning operation."""
+        obj = UpdateWeightsFromTensorReqInput(
+            serialized_named_tensors=named_tensors,
+            load_format=load_format,
+            flush_cache=flush_cache,
+        )
+        return await self.tokenizer_manager.update_weights_from_tensor(obj, None)
+
     def update_weights_from_disk(
         self,
         model_path: str,
@@ -444,6 +459,10 @@ class Engine(EngineBase):
             self.tokenizer_manager.release_memory_occupation(obj, None)
         )
 
+    async def async_release_memory_occupation(self):
+        obj = ReleaseMemoryOccupationReqInput()
+        return await self.tokenizer_manager.release_memory_occupation(obj, None)
+
     def resume_memory_occupation(self):
         """Resume GPU occupation."""
         obj = ResumeMemoryOccupationReqInput()
@@ -451,6 +470,10 @@ class Engine(EngineBase):
         return loop.run_until_complete(
             self.tokenizer_manager.resume_memory_occupation(obj, None)
         )
+
+    async def async_resume_memory_occupation(self):
+        obj = ResumeMemoryOccupationReqInput()
+        return await self.tokenizer_manager.resume_memory_occupation(obj, None)
 
     """
     Execute an RPC call on all scheduler processes.
